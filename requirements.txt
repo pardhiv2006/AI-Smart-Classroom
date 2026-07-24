@@ -1,0 +1,43 @@
+# Core Framework
+streamlit>=1.35.0
+
+# LLM & LangChain
+langchain>=0.2.0
+langchain-core>=0.2.0
+langchain-community>=0.2.0
+
+# Ollama (local LLM — no paid API)
+langchain-ollama
+
+# Embeddings (local, ~90MB, M2 optimized)
+sentence-transformers>=2.7.0
+huggingface-hub>=0.23.0
+transformers>=4.40.0,<5.0.0
+langchain-huggingface>=1.0.0
+
+# Vector Database (persistent)
+chromadb>=0.5.0
+
+# Document parsing
+pymupdf>=1.24.0
+python-docx>=1.1.0
+
+# Database
+# sqlite3 is built-in to Python
+
+# Analytics charts
+plotly>=5.22.0
+
+# Data
+pandas>=2.2.0
+numpy>=1.26.0
+
+# PDF export
+reportlab>=4.2.0
+
+# Utils
+python-dotenv>=1.0.0
+requests>=2.31.0
+
+# Text splitting
+langchain-text-splitters>=0.2.0
