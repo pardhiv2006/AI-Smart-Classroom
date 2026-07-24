@@ -42,7 +42,7 @@
 ## 📁 Folder Structure
 
 ```text
-AI_Smart_Class/
+AI-Smart-Classroom/
 ├── app.py                      # Main entry point (theme injection -> auth gate -> routing)
 ├── requirements.txt            # Python dependencies
 ├── README.md                   # Project documentation
@@ -90,8 +90,8 @@ AI_Smart_Class/
 
 #### 🍏 macOS / Linux
 ```bash
-git clone https://github.com/your-username/AI_Smart_Class.git
-cd AI_Smart_Class
+git clone https://github.com/pardhiv2006/AI-Smart-Classroom.git
+cd AI-Smart-Classroom
 
 # Create & activate virtual environment
 python3 -m venv venv
@@ -103,8 +103,8 @@ pip install -r requirements.txt
 
 #### 🪟 Windows (Command Prompt / cmd.exe)
 ```cmd
-git clone https://github.com/your-username/AI_Smart_Class.git
-cd AI_Smart_Class
+git clone https://github.com/pardhiv2006/AI-Smart-Classroom.git
+cd AI-Smart-Classroom
 
 :: Create & activate virtual environment
 python -m venv venv
@@ -116,8 +116,8 @@ pip install -r requirements.txt
 
 #### ⚡ Windows (PowerShell)
 ```powershell
-git clone https://github.com/your-username/AI_Smart_Class.git
-cd AI_Smart_Class
+git clone https://github.com/pardhiv2006/AI-Smart-Classroom.git
+cd AI-Smart-Classroom
 
 # Create & activate virtual environment
 python -m venv venv
