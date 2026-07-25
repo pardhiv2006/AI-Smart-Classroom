@@ -156,6 +156,56 @@ PERSONA_ICONS = {
 }
 
 
+def get_groq_api_key() -> str:
+    """Retrieve Groq API key from session_state, Streamlit Secrets, or environment."""
+    key = st.session_state.get("groq_api_key", "")
+    if not key:
+        try:
+            key = st.secrets.get("GROQ_API_KEY", "")
+        except Exception:
+            key = ""
+    if not key:
+        import os
+        key = os.environ.get("GROQ_API_KEY", "")
+    return key.strip()
+
+
+def call_groq_api(prompt_messages, api_key: str, model: str = "llama-3.3-70b-versatile") -> str:
+    """
+    Call Groq API using HTTP requests (fast cloud inference, zero extra dependencies).
+    """
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {api_key.strip()}",
+        "Content-Type": "application/json"
+    }
+
+    formatted_messages = []
+    if isinstance(prompt_messages, list):
+        for msg in prompt_messages:
+            if hasattr(msg, "type") and hasattr(msg, "content"):
+                role = "system" if msg.type == "system" else "user"
+                formatted_messages.append({"role": role, "content": msg.content})
+            elif isinstance(msg, tuple):
+                role = "system" if msg[0] == "system" else "user"
+                formatted_messages.append({"role": role, "content": msg[1]})
+            elif isinstance(msg, dict):
+                formatted_messages.append(msg)
+
+    payload = {
+        "model": model,
+        "messages": formatted_messages,
+        "temperature": 0.3
+    }
+
+    resp = requests.post(url, headers=headers, json=payload, timeout=25)
+    if resp.status_code == 200:
+        data = resp.json()
+        return data["choices"][0]["message"]["content"]
+    else:
+        raise Exception(f"Groq API Error ({resp.status_code}): {resp.text}")
+
+
 # ─────────────────────────────────────────────────────────────────
 # CORE Q&A FUNCTION
 # ─────────────────────────────────────────────────────────────────
@@ -169,12 +219,7 @@ def answer_question(
     book_name: str = "",
 ) -> tuple[str, list[dict]]:
     """
-    Run RAG Q&A with 7-step debug workflow:
-      Step 2: Print Selected Book, Collection Name, Filter, Top-K
-      Step 3: Print Retrieved Chunks
-      Step 4: Verify metadata (book_name, page, chunk_id)
-      Step 5: Print exact prompt context
-      Step 7: Automatic root cause diagnosis & fallback
+    Run RAG Q&A with 7-step debug workflow and Groq Cloud / Ollama fallback.
     """
     col_name = getattr(db, "_collection_name", "chroma_collection")
     print(f"\n--- [RAG DEBUG - Step 2] ---")
@@ -214,10 +259,10 @@ def answer_question(
         p_num = meta.get("page", 1)
         c_id = meta.get("chunk_id", idx)
         b_name = meta.get("book_name") or meta.get("source") or book_name
-        
+
         print(f"Chunk {idx+1}: {{'book_name': '{b_name}', 'page': {p_num}, 'chunk_id': {c_id}}}")
         print(f"Snippet : {doc.page_content[:140]}...\n")
-        
+
         context_parts.append(f"--- Page {p_num} (Chunk {c_id}) ---\n{doc.page_content}")
         sources.append({"page": p_num, "snippet": doc.page_content[:200] + "…", "chunk_id": c_id})
 
@@ -235,13 +280,33 @@ def answer_question(
         ("system", system_prompt),
         ("human", "Textbook Context:\n{context}\n\nStudent Question:\n{question}"),
     ])
+    formatted_msgs = prompt.format_messages(context=context_str, question=question)
 
-    llm = get_llm(model_name)
+    groq_key = get_groq_api_key()
+
+    # Try Groq API first if key is present
+    if groq_key:
+        try:
+            print("[RAG DEBUG] Using Groq Cloud API for ultra-fast response...")
+            ans = call_groq_api(formatted_msgs, groq_key)
+            return ans, sources
+        except Exception as groq_err:
+            print(f"[RAG DEBUG] Groq API warning: {groq_err}. Falling back to Ollama...")
+
+    # Fallback / Default: Local Ollama
     try:
-        response = llm.invoke(prompt.format_messages(context=context_str, question=question))
+        llm = get_llm(model_name)
+        response = llm.invoke(formatted_msgs)
         return response.content, sources
     except Exception as e:
         error_msg = str(e)
+        if groq_key:
+            return f"❌ Error executing AI query: {error_msg}", sources
         if "connection" in error_msg.lower() or "refused" in error_msg.lower():
-            return f"❌ Cannot connect to Ollama. Please run `ollama serve`.", sources
+            return (
+                "⚠️ **Ollama server is not running locally.**\n\n"
+                "To fix this:\n"
+                "1. Run `ollama serve` locally\n"
+                "2. OR paste your **Groq API Key** in **Settings ⚙️** for instant 24/7 cloud AI!"
+            ), sources
         return f"❌ AI error: {error_msg}", sources

@@ -215,9 +215,31 @@ def render():
             st.markdown("""
             <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3);
                         border-radius:10px; padding:0.8rem 1rem; margin-top:0.5rem; font-size:0.85rem;">
-                ⚠️ <b>No Ollama models detected.</b> Start server with <code>ollama serve</code> and pull a model: <code>ollama pull llama3</code>
+                ⚠️ <b>No local Ollama models detected.</b> You can use local Ollama or paste a free <b>Groq API Key</b> below for instant 24/7 cloud AI!
             </div>
             """, unsafe_allow_html=True)
+
+        st.markdown("<hr style='margin: 1.25rem 0 1rem; opacity: 0.15;'>", unsafe_allow_html=True)
+        st.markdown("##### ⚡ Cloud AI Provider (Groq API Key)")
+        st.markdown("<p style='font-size: 0.82rem; opacity: 0.7; margin-top: -0.25rem;'>Add a Groq API Key to enable ultra-fast 24/7 cloud LLM responses without needing a local GPU.</p>", unsafe_allow_html=True)
+
+        from app.rag.qa_chain import get_groq_api_key
+        current_groq_key = get_groq_api_key()
+
+        groq_input = st.text_input(
+            "Groq API Key",
+            value=current_groq_key,
+            type="password",
+            placeholder="gsk_...",
+            key="groq_key_input_field",
+            help="Get your free API key from https://console.groq.com/keys"
+        )
+
+        if st.button("💾 Save Groq API Key", key="save_groq_key_btn", type="primary"):
+            st.session_state["groq_api_key"] = groq_input.strip()
+            _save_pref(user_id, "groq_api_key", groq_input.strip())
+            st.success("✅ Groq API Key saved successfully!")
+            st.rerun()
 
     # ══════════════════════════════════════════════════
     # SECTION 4: AI PERSONA
