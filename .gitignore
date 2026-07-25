@@ -37,6 +37,7 @@ python/
 .env.backup
 .env.dev
 .env.prod
+.streamlit/secrets.toml
 
 # Vector database folders (contains heavy binary files)
 Chroma_db/
