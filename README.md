@@ -1,10 +1,17 @@
 # 🧠 Mr. AI Smart Classroom — Production AI Learning Platform
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/framework-Streamlit%201.32%2B-FF4B4B.svg)](https://streamlit.io/)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-smart-classroom-p.streamlit.app/)
 [![Ollama Integration](https://img.shields.io/badge/AI-Ollama%20RAG-000000.svg)](https://ollama.ai/)
+[![Groq Cloud AI](https://img.shields.io/badge/Cloud%20AI-Groq%20Llama%203.3-f05023.svg)](https://groq.com/)
 [![ChromaDB Vector Store](https://img.shields.io/badge/VectorDB-ChromaDB-6A0DAD.svg)](https://docs.trychroma.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+---
+
+## 🌐 Live Demo
+
+👉 **Try it Live online:** [**https://ai-smart-classroom-p.streamlit.app**](https://ai-smart-classroom-p.streamlit.app/)
 
 ---
 
